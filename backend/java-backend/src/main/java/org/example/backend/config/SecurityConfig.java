@@ -39,10 +39,11 @@ public class SecurityConfig {
         http
                 //disable csrf
                 .csrf(customizer -> customizer.disable())
-                //have authorization enforced for each request
-                .authorizeHttpRequests(request -> request.anyRequest().authenticated())
-                //intercepts and decodes the provided username and password. Then it hands it to the AuthenticationManager
-                .httpBasic(Customizer.withDefaults())
+                
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("all", "hi")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 //make the session stateless for each login
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
