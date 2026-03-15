@@ -4,6 +4,9 @@ import org.example.backend.entity.User;
 import org.example.backend.entity.UserDTO;
 import org.example.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,10 +15,12 @@ import java.util.List;
 @RequestMapping("/")
 public class StudentController {
 
+    private final AuthenticationManager authenticationManager;
     private UserService userService;
 
-    public StudentController(UserService userService) {
+    public StudentController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
     }
 
     //test authorization
@@ -39,7 +44,16 @@ public class StudentController {
     @PostMapping("/login")
     public String loginUser (@RequestBody UserDTO userDTO) {
 
-        return "Test";
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(
+                        userDTO.getUsername(), userDTO.getPassword()
+                ));
+
+        if (authentication.isAuthenticated()) {
+            return "Token will be returning in Avengers Doomsday";
+        } else {
+            return "Login failed";
+        }
 
     }
 
