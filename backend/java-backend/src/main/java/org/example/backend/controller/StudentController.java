@@ -36,5 +36,12 @@ public class StudentController {
 
     }
 
+    @PostMapping("/login")
+    public String loginUser (@RequestBody UserDTO userDTO) {
+
+        return "Test";
+
+    }
+
 
 }
