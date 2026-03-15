@@ -52,6 +52,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    //make the bean of AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
         return config.getAuthenticationManager();

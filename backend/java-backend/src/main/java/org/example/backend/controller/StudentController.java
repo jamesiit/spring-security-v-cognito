@@ -44,6 +44,8 @@ public class StudentController {
     @PostMapping("/login")
     public String loginUser (@RequestBody UserDTO userDTO) {
 
+        //creating the temporary token
+        //AuthenticationManager will now take the username and password and give it to the DaoProvider for verification
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(
                         userDTO.getUsername(), userDTO.getPassword()
