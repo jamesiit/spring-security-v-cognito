@@ -62,6 +62,26 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- you get the interfaces from this -->
+        <dependency>
+            <groupId> io.jsonwebtoken </groupId>
+            <artifactId> jjwt-api </artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <!-- the under the hood cryptographic stuff happens with this one -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- to serialize/deserialize -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>

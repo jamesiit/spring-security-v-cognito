@@ -1,16 +1,20 @@
 package org.example.backend.config;
 
+import org.example.backend.filter.JWTFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -18,9 +22,11 @@ public class SecurityConfig {
 
     //mark it as such so that Spring will search for your custom service that implements this!
     private UserDetailsService userDetailsService;
+    private JWTFilter jwtFilter;
 
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    public SecurityConfig(UserDetailsService userDetailsService, JWTFilter jwtFilter) {
         this.userDetailsService = userDetailsService;
+        this.jwtFilter = jwtFilter;
     }
 
     @Bean
@@ -39,13 +45,21 @@ public class SecurityConfig {
         http
                 //disable csrf
                 .csrf(customizer -> customizer.disable())
-                //have authorization enforced for each request
-                .authorizeHttpRequests(request -> request.anyRequest().authenticated())
-                //intercepts and decodes the provided username and password. Then it hands it to the AuthenticationManager
-                .httpBasic(Customizer.withDefaults())
-                //make the session stateless for each login
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-      return http.build();
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers("/all", "/login", "/register")
+                        .permitAll()
+                        .anyRequest().authenticated())
+                //make the session stateless for each login
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
+
+    //make the bean of AuthenticationManager
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+        return config.getAuthenticationManager();
+    }
+
 }
