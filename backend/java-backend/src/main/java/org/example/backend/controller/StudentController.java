@@ -37,7 +37,7 @@ public class StudentController {
         return userService.getAllUsers();
     }
 
-    @PostMapping("/all")
+    @PostMapping("/register")
     public User createUser (@RequestBody UserDTO userDTO) {
 
         return userService.saveUser(userDTO);
