@@ -2,6 +2,7 @@ package org.example.backend.controller;
 
 import org.example.backend.entity.User;
 import org.example.backend.entity.UserDTO;
+import org.example.backend.service.JWTService;
 import org.example.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,10 +18,12 @@ public class StudentController {
 
     private final AuthenticationManager authenticationManager;
     private UserService userService;
+    private JWTService jwtService;
 
-    public StudentController(UserService userService, AuthenticationManager authenticationManager) {
+    public StudentController(UserService userService, AuthenticationManager authenticationManager, JWTService jwtService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     //test authorization
@@ -52,7 +55,7 @@ public class StudentController {
                 ));
 
         if (authentication.isAuthenticated()) {
-            return "Token will be returning in Avengers Doomsday";
+            return jwtService.generateToken(userDTO.getUsername());
         } else {
             return "Login failed";
         }
