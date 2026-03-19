@@ -61,5 +61,8 @@ public class JWTFilter extends OncePerRequestFilter {
 
         }
 
+        // moves the flow to the next filter!
+        filterChain.doFilter(request, response);
+
     }
 }
