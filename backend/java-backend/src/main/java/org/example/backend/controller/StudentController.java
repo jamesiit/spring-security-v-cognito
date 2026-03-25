@@ -2,7 +2,10 @@ package org.example.backend.controller;
 
 import org.example.backend.entity.User;
 import org.example.backend.entity.UserDTO;
+import org.example.backend.entity.VerificationToken;
+import org.example.backend.repo.VerificationTokenRepo;
 import org.example.backend.service.JWTService;
+import org.example.backend.service.OtpGeneratorService;
 import org.example.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,11 +22,15 @@ public class StudentController {
     private final AuthenticationManager authenticationManager;
     private UserService userService;
     private JWTService jwtService;
+    private VerificationTokenRepo verificationTokenRepo;
+    private OtpGeneratorService otpGenerator;
 
-    public StudentController(UserService userService, AuthenticationManager authenticationManager, JWTService jwtService) {
-        this.userService = userService;
+    public StudentController(AuthenticationManager authenticationManager, UserService userService, JWTService jwtService, VerificationTokenRepo verificationTokenRepo, OtpGeneratorService otpGenerator) {
         this.authenticationManager = authenticationManager;
+        this.userService = userService;
         this.jwtService = jwtService;
+        this.verificationTokenRepo = verificationTokenRepo;
+        this.otpGenerator = otpGenerator;
     }
 
     //test authorization
@@ -40,7 +47,18 @@ public class StudentController {
     @PostMapping("/register")
     public User createUser (@RequestBody UserDTO userDTO) {
 
-        return userService.saveUser(userDTO);
+        // password hashing logic
+        User savedUser = userService.saveUser(userDTO);
+
+        // generate OTP
+        String newCode = otpGenerator.generateOTP();
+
+        // initialize entity
+        VerificationToken verificationToken = new VerificationToken(newCode, savedUser);
+
+        verificationTokenRepo.save(verificationToken);
+
+        return savedUser;
 
     }
 
