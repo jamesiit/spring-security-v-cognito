@@ -5,6 +5,7 @@ import org.example.backend.entity.UserDTO;
 import org.example.backend.entity.VerificationToken;
 import org.example.backend.repo.VerificationTokenRepo;
 import org.example.backend.service.JWTService;
+import org.example.backend.service.MailService;
 import org.example.backend.service.OtpGeneratorService;
 import org.example.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -24,18 +25,21 @@ public class StudentController {
     private JWTService jwtService;
     private VerificationTokenRepo verificationTokenRepo;
     private OtpGeneratorService otpGenerator;
+    private MailService mailService;
 
-    public StudentController(AuthenticationManager authenticationManager, UserService userService, JWTService jwtService, VerificationTokenRepo verificationTokenRepo, OtpGeneratorService otpGenerator) {
+    public StudentController(AuthenticationManager authenticationManager, UserService userService, JWTService jwtService, VerificationTokenRepo verificationTokenRepo, OtpGeneratorService otpGenerator, MailService mailService) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.jwtService = jwtService;
         this.verificationTokenRepo = verificationTokenRepo;
         this.otpGenerator = otpGenerator;
+        this.mailService = mailService;
     }
 
-    //test authorization
+    //test authorization and email
     @GetMapping("/hi")
     public String sayHello() {
+        mailService.sendSimpleMessage();
         return "Hi";
     }
 
