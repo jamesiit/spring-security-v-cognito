@@ -8,6 +8,7 @@ import org.example.backend.service.JWTService;
 import org.example.backend.service.MailService;
 import org.example.backend.service.OtpGeneratorService;
 import org.example.backend.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,9 +39,9 @@ public class StudentController {
 
     //test authorization and email
     @GetMapping("/hi")
-    public String sayHello() {
+    public ResponseEntity<String> sayHello() {
         mailService.sendSimpleMessage();
-        return "Hi";
+        return new ResponseEntity<>("Hi", HttpStatus.OK);
     }
 
     @GetMapping("/all")
