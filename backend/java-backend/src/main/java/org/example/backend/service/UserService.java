@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -28,5 +29,14 @@ public class UserService {
         user.setPassword(encoder.encode(userDTO.getPassword()));
         System.out.println(user.getPassword());
         return userRepo.save(user);
+    }
+
+    public User checkUserByUsername(String otpUsername) {
+        return userRepo.findByUsername(otpUsername);
+    }
+
+
+    public User saveUpdatedUser(User checkUser) {
+        return userRepo.save(checkUser);
     }
 }

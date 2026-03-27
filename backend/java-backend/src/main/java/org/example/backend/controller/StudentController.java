@@ -1,13 +1,11 @@
 package org.example.backend.controller;
 
+import org.example.backend.entity.OtpDTO;
 import org.example.backend.entity.User;
 import org.example.backend.entity.UserDTO;
 import org.example.backend.entity.VerificationToken;
 import org.example.backend.repo.VerificationTokenRepo;
-import org.example.backend.service.JWTService;
-import org.example.backend.service.MailService;
-import org.example.backend.service.OtpGeneratorService;
-import org.example.backend.service.UserService;
+import org.example.backend.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,14 +25,16 @@ public class StudentController {
     private VerificationTokenRepo verificationTokenRepo;
     private OtpGeneratorService otpGenerator;
     private MailService mailService;
+    private TokenService tokenService;
 
-    public StudentController(AuthenticationManager authenticationManager, UserService userService, JWTService jwtService, VerificationTokenRepo verificationTokenRepo, OtpGeneratorService otpGenerator, MailService mailService) {
+    public StudentController(AuthenticationManager authenticationManager, UserService userService, JWTService jwtService, VerificationTokenRepo verificationTokenRepo, OtpGeneratorService otpGenerator, MailService mailService, TokenService tokenService) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.jwtService = jwtService;
         this.verificationTokenRepo = verificationTokenRepo;
         this.otpGenerator = otpGenerator;
         this.mailService = mailService;
+        this.tokenService = tokenService;
     }
 
     //test authorization and email
@@ -82,6 +82,42 @@ public class StudentController {
         } else {
             return "Login failed";
         }
+
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyUser(@RequestBody OtpDTO otpDTO) {
+
+        // check if user exists first
+        User checkUser = userService.checkUserByUsername(otpDTO.getOtpUsername());
+
+        if (checkUser == null) {
+            return new ResponseEntity<>("User does not exist!", HttpStatus.OK);
+        }
+
+        //check if token is valid
+        VerificationToken token = tokenService.verifyToken(otpDTO.getOtpString());
+
+        if (token == null) {
+            return new ResponseEntity<>("Invalid OTP!", HttpStatus.OK);
+        }
+
+        // check if token belongs to user
+        if (checkUser.getId() != token.getUser().getId()) {
+            return new ResponseEntity<>("OTP not valid for user", HttpStatus.OK);
+        }
+
+        // check if token is expired
+        if (token.isExpired()) {
+            return new ResponseEntity<>("time has expired! try again", HttpStatus.OK);
+        }
+
+        checkUser.setEnabled(true);
+
+        // save updated user to database
+        User updatedUser = userService.saveUpdatedUser(checkUser);
+
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
 
     }
 
