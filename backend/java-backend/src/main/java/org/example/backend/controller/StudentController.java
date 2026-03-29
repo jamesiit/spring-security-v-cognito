@@ -37,7 +37,6 @@ public class StudentController {
     //test authorization and email
     @GetMapping("/hi")
     public ResponseEntity<String> sayHello() {
-        mailService.sendSimpleMessage();
         return new ResponseEntity<>("Hi", HttpStatus.OK);
     }
 
@@ -58,6 +57,9 @@ public class StudentController {
         // initialize entity
         VerificationToken verificationToken = new VerificationToken(newCode, savedUser);
 
+        // send the email
+        mailService.sendSimpleMessage(userDTO.getUsername(), newCode);
+        
         // save token
         tokenService.saveToken(verificationToken);
 
@@ -113,9 +115,9 @@ public class StudentController {
         checkUser.setEnabled(true);
 
         // save updated user to database
-        User updatedUser = userService.saveUpdatedUser(checkUser);
+        userService.saveUpdatedUser(checkUser);
 
-        return new ResponseEntity<>(updatedUser, HttpStatus.CREATED);
+        return new ResponseEntity<>("Alright! You're in!", HttpStatus.CREATED);
 
     }
 
