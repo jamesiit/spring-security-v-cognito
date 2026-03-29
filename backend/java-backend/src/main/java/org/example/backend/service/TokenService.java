@@ -20,4 +20,8 @@ public class TokenService {
     public void saveToken(VerificationToken verificationToken) {
         tokenRepo.save(verificationToken);
     }
+
+    public void deleteToken(VerificationToken token) {
+        tokenRepo.delete(token);
+    }
 }

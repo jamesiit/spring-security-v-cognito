@@ -114,6 +114,9 @@ public class StudentController {
 
         checkUser.setEnabled(true);
 
+        // delete the token
+        tokenService.deleteToken(token);
+
         // save updated user to database
         userService.saveUpdatedUser(checkUser);
 
