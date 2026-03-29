@@ -97,17 +97,17 @@ public class StudentController {
         VerificationToken token = tokenService.verifyToken(otpDTO.getOtpString());
 
         if (token == null) {
-            return new ResponseEntity<>("Invalid OTP!", HttpStatus.OK);
+            return new ResponseEntity<>("Invalid OTP!", HttpStatus.BAD_REQUEST);
         }
 
         // check if token belongs to user
         if (checkUser.getId() != token.getUser().getId()) {
-            return new ResponseEntity<>("OTP not valid for user", HttpStatus.OK);
+            return new ResponseEntity<>("OTP not valid for user", HttpStatus.BAD_REQUEST);
         }
 
         // check if token is expired
         if (token.isExpired()) {
-            return new ResponseEntity<>("time has expired! try again", HttpStatus.OK);
+            return new ResponseEntity<>("time has expired! try again", HttpStatus.BAD_REQUEST);
         }
 
         checkUser.setEnabled(true);
@@ -115,7 +115,7 @@ public class StudentController {
         // save updated user to database
         User updatedUser = userService.saveUpdatedUser(checkUser);
 
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        return new ResponseEntity<>(updatedUser, HttpStatus.CREATED);
 
     }
 
