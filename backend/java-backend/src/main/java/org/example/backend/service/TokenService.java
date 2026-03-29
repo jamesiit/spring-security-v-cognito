@@ -16,4 +16,8 @@ public class TokenService {
     public VerificationToken verifyToken(String otpString) {
         return tokenRepo.findByOtpString(otpString);
     }
+
+    public void saveToken(VerificationToken verificationToken) {
+        tokenRepo.save(verificationToken);
+    }
 }

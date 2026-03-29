@@ -4,7 +4,6 @@ import org.example.backend.entity.OtpDTO;
 import org.example.backend.entity.User;
 import org.example.backend.entity.UserDTO;
 import org.example.backend.entity.VerificationToken;
-import org.example.backend.repo.VerificationTokenRepo;
 import org.example.backend.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +21,14 @@ public class StudentController {
     private final AuthenticationManager authenticationManager;
     private UserService userService;
     private JWTService jwtService;
-    private VerificationTokenRepo verificationTokenRepo;
     private OtpGeneratorService otpGenerator;
     private MailService mailService;
     private TokenService tokenService;
 
-    public StudentController(AuthenticationManager authenticationManager, UserService userService, JWTService jwtService, VerificationTokenRepo verificationTokenRepo, OtpGeneratorService otpGenerator, MailService mailService, TokenService tokenService) {
+    public StudentController(AuthenticationManager authenticationManager, UserService userService, JWTService jwtService, OtpGeneratorService otpGenerator, MailService mailService, TokenService tokenService) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
         this.jwtService = jwtService;
-        this.verificationTokenRepo = verificationTokenRepo;
         this.otpGenerator = otpGenerator;
         this.mailService = mailService;
         this.tokenService = tokenService;
@@ -61,7 +58,8 @@ public class StudentController {
         // initialize entity
         VerificationToken verificationToken = new VerificationToken(newCode, savedUser);
 
-        verificationTokenRepo.save(verificationToken);
+        // save token
+        tokenService.saveToken(verificationToken);
 
         return savedUser;
 
