@@ -1,9 +1,11 @@
 package org.example.backend.controller;
 
+import org.example.backend.entity.OtpDTO;
 import org.example.backend.entity.User;
 import org.example.backend.entity.UserDTO;
-import org.example.backend.service.JWTService;
-import org.example.backend.service.UserService;
+import org.example.backend.entity.VerificationToken;
+import org.example.backend.service.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,17 +21,23 @@ public class StudentController {
     private final AuthenticationManager authenticationManager;
     private UserService userService;
     private JWTService jwtService;
+    private OtpGeneratorService otpGenerator;
+    private MailService mailService;
+    private TokenService tokenService;
 
-    public StudentController(UserService userService, AuthenticationManager authenticationManager, JWTService jwtService) {
-        this.userService = userService;
+    public StudentController(AuthenticationManager authenticationManager, UserService userService, JWTService jwtService, OtpGeneratorService otpGenerator, MailService mailService, TokenService tokenService) {
         this.authenticationManager = authenticationManager;
+        this.userService = userService;
         this.jwtService = jwtService;
+        this.otpGenerator = otpGenerator;
+        this.mailService = mailService;
+        this.tokenService = tokenService;
     }
 
-    //test authorization
+    //test authorization and email
     @GetMapping("/hi")
-    public String sayHello() {
-        return "Hi";
+    public ResponseEntity<String> sayHello() {
+        return new ResponseEntity<>("Hi", HttpStatus.OK);
     }
 
     @GetMapping("/all")
@@ -40,7 +48,22 @@ public class StudentController {
     @PostMapping("/register")
     public User createUser (@RequestBody UserDTO userDTO) {
 
-        return userService.saveUser(userDTO);
+        // password hashing logic
+        User savedUser = userService.saveUser(userDTO);
+
+        // generate OTP
+        String newCode = otpGenerator.generateOTP();
+
+        // initialize entity
+        VerificationToken verificationToken = new VerificationToken(newCode, savedUser);
+
+        // send the email
+        mailService.sendSimpleMessage(userDTO.getUsername(), newCode);
+        
+        // save token
+        tokenService.saveToken(verificationToken);
+
+        return savedUser;
 
     }
 
@@ -59,6 +82,45 @@ public class StudentController {
         } else {
             return "Login failed";
         }
+
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyUser(@RequestBody OtpDTO otpDTO) {
+
+        // check if user exists first
+        User checkUser = userService.checkUserByUsername(otpDTO.getOtpUsername());
+
+        if (checkUser == null) {
+            return new ResponseEntity<>("User does not exist!", HttpStatus.OK);
+        }
+
+        //check if token is valid
+        VerificationToken token = tokenService.verifyToken(otpDTO.getOtpString());
+
+        if (token == null) {
+            return new ResponseEntity<>("Invalid OTP!", HttpStatus.BAD_REQUEST);
+        }
+
+        // check if token belongs to user
+        if (checkUser.getId() != token.getUser().getId()) {
+            return new ResponseEntity<>("OTP not valid for user", HttpStatus.BAD_REQUEST);
+        }
+
+        // check if token is expired
+        if (token.isExpired()) {
+            return new ResponseEntity<>("time has expired! try again", HttpStatus.BAD_REQUEST);
+        }
+
+        checkUser.setEnabled(true);
+
+        // delete the token
+        tokenService.deleteToken(token);
+
+        // save updated user to database
+        userService.saveUpdatedUser(checkUser);
+
+        return new ResponseEntity<>("Alright! You're in!", HttpStatus.CREATED);
 
     }
 
