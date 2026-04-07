@@ -1,9 +1,10 @@
 import './App.css'
+import CognitoSignUpForm from "./components/CognitoSignUpForm.jsx";
 
 function App() {
 
   return (
-    <p> Spring Security vs Cognito? I thought Iran vs US these days </p>
+    <CognitoSignUpForm />
   )
 }
 
