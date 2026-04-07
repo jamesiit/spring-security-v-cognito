@@ -1,13 +1,19 @@
 import { useForm } from "react-hook-form";
 import {z} from "zod"
 import {zodResolver} from "@hookform/resolvers/zod";
+import { signUp } from "aws-amplify/auth"
 
 export default function CognitoSignUpForm() {
 
     // define the schema for zod
     const schema = z.object({
         email: z.string().email("Please enter a valid email"),
-        password: z.string().min(8, "Password should be at least 8 characters!")
+        password: z.string()
+            .min(8, "Password should be at least 8 characters!")
+            .regex(/[A-Z]/, "Should contain at least 1 uppercase letter")
+            .regex(/[a-z]/, "Should contain at least 1 lowercase letter")
+            .regex(/[0-9]/, "Should contains at least 1 number")
+            .regex(/[^a-zA-Z0-9]/, "Should contain at least 1 special character!")
     })
 
     const { register,
@@ -18,8 +24,15 @@ export default function CognitoSignUpForm() {
     });
 
     const onSubmitForm = async (data) => {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log(data)
+
+        const { isSignUpComplete, userId, nextStep} = await signUp({
+            username: data.email,
+            password: data.password
+        })
+
+        console.log(isSignUpComplete)
+
+
     }
 
     return (
