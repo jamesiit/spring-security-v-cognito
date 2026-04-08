@@ -9,6 +9,7 @@ export default function CognitoSignUpForm() {
 
     const [isOTPPhase, setIsOTPPhase] = useState(false)
     const [unconfirmedEmail, setUnconfirmedEmail] = useState("");
+    const [showPassword, setShowPassword] = useState(false)
 
     // define the schema for zod
     const schema = z.object({
@@ -29,6 +30,11 @@ export default function CognitoSignUpForm() {
         resolver: zodResolver(schema)
     });
 
+    function handleShow(event) {
+        event.preventDefault()
+        setShowPassword(!showPassword)
+    }
+
     const onSubmitForm = async (data) => {
 
         try {
@@ -47,8 +53,6 @@ export default function CognitoSignUpForm() {
                 message: error.message
             })
         }
-
-
 
     }
 
@@ -77,13 +81,14 @@ export default function CognitoSignUpForm() {
                 )}
             </div>
 
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 relative">
                 <input
                     {...register("password")}
-                    type="password"
+                    type={ showPassword ? "text" : "password" }
                     placeholder="Password"
                     className="w-full px-4 py-3 bg-neutral-900 text-white rounded-md border border-neutral-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-neutral-500 transition-all"
                 />
+                <button onClick={handleShow} className="absolute right-0 content-center pr-20 text-white px-6 py-3"> Show </button>
                 {errors.password && (
                     <div className="text-red-500 text-sm ml-1">{errors.password.message}</div>
                 )}
