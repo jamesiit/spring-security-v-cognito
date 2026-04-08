@@ -1,9 +1,14 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {z} from "zod"
 import {zodResolver} from "@hookform/resolvers/zod";
 import { signUp } from "aws-amplify/auth"
+import InputOtpForm from "./InputOtpForm.jsx";
 
 export default function CognitoSignUpForm() {
+
+    const [isOTPPhase, setIsOTPPhase] = useState(false)
+    const [unconfirmedEmail, setUnconfirmedEmail] = useState("");
 
     // define the schema for zod
     const schema = z.object({
@@ -18,27 +23,48 @@ export default function CognitoSignUpForm() {
 
     const { register,
         handleSubmit,
-        formState: {errors, isSubmitting}
+        formState: {errors, isSubmitting},
+        setError
     } = useForm({
         resolver: zodResolver(schema)
     });
 
     const onSubmitForm = async (data) => {
 
-        const { isSignUpComplete, userId, nextStep} = await signUp({
-            username: data.email,
-            password: data.password
-        })
+        try {
+            const {isSignUpComplete, userId, nextStep} = await signUp({
+                username: data.email,
+                password: data.password
+            })
 
-        console.log(isSignUpComplete)
+            if (nextStep.signUpStep === "CONFIRM_SIGN_UP" && isSignUpComplete === false) {
+                setUnconfirmedEmail(data.email)
+                setIsOTPPhase(true)
+            }
+        } catch (error) {
+            setError("root", {
+                type:"server",
+                message: error.message
+            })
+        }
+
 
 
     }
 
-    return (
+    return isOTPPhase ? (
+      <InputOtpForm email= {unconfirmedEmail} />  ) : (
         <form
             onSubmit={handleSubmit(onSubmitForm)}
-            className="w-full max-w-md flex flex-col gap-6 p-8 bg-black rounded-xl shadow-xl shadow-emerald-500/20 mx-auto">
+            className="w-full max-w-md flex flex-col gap-6 p-8 bg-black rounded-xl shadow-xl shadow-emerald-500/20 mx-auto"
+        >
+
+            {errors.root && (
+                <div className="w-full p-3 mb-4 bg-red-500/10 border border-red-500/50 rounded-md text-red-500 text-sm text-center">
+                    {errors.root.message}
+                </div>
+            )}
+
             <div className="flex flex-col gap-1">
                 <input
                     {...register("email")}
@@ -71,5 +97,5 @@ export default function CognitoSignUpForm() {
                 {isSubmitting ? "Loading..." : "Submit"}
             </button>
         </form>
-    );
+    )
 }
