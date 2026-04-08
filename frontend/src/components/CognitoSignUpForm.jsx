@@ -88,7 +88,7 @@ export default function CognitoSignUpForm() {
                     placeholder="Password"
                     className="w-full px-4 py-3 bg-neutral-900 text-white rounded-md border border-neutral-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder:text-neutral-500 transition-all"
                 />
-                <button onClick={handleShow} className="absolute right-0 content-center pr-20 text-white px-6 py-3"> Show </button>
+                <button onClick={handleShow} className="absolute right-0 top-1/2 -translate-y-1/2 content-center text-sm font-medium pr-20 text-neutral-400 hover:text-emerald-400 px-6 py-3"> { showPassword ? "Hide" : "Show" } </button>
                 {errors.password && (
                     <div className="text-red-500 text-sm ml-1">{errors.password.message}</div>
                 )}
