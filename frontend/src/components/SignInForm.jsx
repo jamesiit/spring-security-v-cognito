@@ -43,12 +43,17 @@ export default function SignInForm() {
     const onSubmitForm = async (data) => {
 
         try {
-            const {isSignUpComplete, nextStep} = await signIn ({
+            const {nextStep} = await signIn ({
                 username: data.email,
                 password: data.password
             })
 
-            // do the redirect later!
+            if (nextStep.signInStep === "DONE") {
+                await context.fetchUserSession()
+
+                navigate("/hi", {replace: true})
+
+            }
 
         } catch (error) {
             setError("root", {
