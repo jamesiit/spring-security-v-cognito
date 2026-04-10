@@ -1,12 +1,17 @@
-import { useState } from "react";
+import {useContext, useState} from "react";
 import { useForm } from "react-hook-form";
 import {z} from "zod"
 import {zodResolver} from "@hookform/resolvers/zod";
 import { signIn } from "aws-amplify/auth"
+import {Navigate} from "react-router";
+import {UserContext} from "../context/UserProvider.jsx";
+import { useNavigate } from "react-router";
 
 export default function SignInForm() {
 
     const [showPassword, setShowPassword] = useState(false)
+    const context = useContext(UserContext)
+    const navigate = useNavigate()
 
     // define the schema for zod
     const schema = z.object({
@@ -22,6 +27,14 @@ export default function SignInForm() {
         resolver: zodResolver(schema)
     });
 
+    if (context.isLoading) {
+        return (
+            <h1> Loading... </h1>
+        )
+    } else if (context.userData !== null) {
+        return <Navigate to="/hi" replace/>
+    }
+
     function handleShow(event) {
         event.preventDefault()
         setShowPassword(!showPassword)
@@ -35,7 +48,7 @@ export default function SignInForm() {
                 password: data.password
             })
 
-            console.log(nextStep.signInStep)
+            // do the redirect later!
 
         } catch (error) {
             setError("root", {
@@ -57,6 +70,19 @@ export default function SignInForm() {
                     {errors.root.message}
                 </div>
             )}
+
+            <div className="flex flex-col gap-1">
+                <p
+                    className="w-full
+                    px-4 py-3 bg-[#1E1E1E]
+                    text-white rounded-md border border-neutral-800
+                    focus:outline-none focus:ring-2 focus:ring-emerald-500
+                    placeholder:text-neutral-500 transition-all"> Log in </p>
+
+                {errors.email && (
+                    <div className="text-red-500 text-sm ml-1">{errors.email.message}</div>
+                )}
+            </div>
 
             <div className="flex flex-col gap-1">
                 <input

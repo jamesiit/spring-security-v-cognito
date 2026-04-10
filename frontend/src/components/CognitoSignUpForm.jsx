@@ -1,17 +1,20 @@
-import { useState } from "react";
+import {useContext, useState} from "react";
 import { useForm } from "react-hook-form";
 import {z} from "zod"
 import {zodResolver} from "@hookform/resolvers/zod";
 import { signUp } from "aws-amplify/auth"
 import InputOtpForm from "./InputOtpForm.jsx";
+import {UserContext} from "../context/UserProvider.jsx";
+import {Navigate} from "react-router";
 
 export default function CognitoSignUpForm() {
 
+    const context = useContext(UserContext)
     const [isOTPPhase, setIsOTPPhase] = useState(false)
     const [unconfirmedEmail, setUnconfirmedEmail] = useState("");
     const [showPassword, setShowPassword] = useState(false)
 
-    // define the schema for zod
+// define the schema for zod
     const schema = z.object({
         email: z.string().email("Please enter a valid email"),
         password: z.string()
@@ -29,6 +32,14 @@ export default function CognitoSignUpForm() {
     } = useForm({
         resolver: zodResolver(schema)
     });
+
+    if (context.isLoading) {
+        return (
+            <h1> Loading... </h1>
+        )
+    } else if (context.userData !== null) {
+        return <Navigate to="/hi" replace/>
+    }
 
     function handleShow(event) {
         event.preventDefault()
@@ -68,6 +79,19 @@ export default function CognitoSignUpForm() {
                     {errors.root.message}
                 </div>
             )}
+
+            <div className="flex flex-col gap-1">
+                <p
+                    className="w-full
+                    px-4 py-3 bg-[#1E1E1E]
+                    text-white rounded-md border border-neutral-800
+                    focus:outline-none focus:ring-2 focus:ring-emerald-500
+                    placeholder:text-neutral-500 transition-all"> Sign up </p>
+
+                {errors.email && (
+                    <div className="text-red-500 text-sm ml-1">{errors.email.message}</div>
+                )}
+            </div>
 
             <div className="flex flex-col gap-1">
                 <input
