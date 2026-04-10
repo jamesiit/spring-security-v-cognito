@@ -19,7 +19,7 @@ export default function TestAuth() {
     return (
     <>
         <h1 className="text-white"> Spring Security vs Cognito? I thought Iran vs US these days! </h1>
-        <p className="text-white"> You're authenticated as: {context.userData} </p>
+        <p className="text-white"> You're authenticated as: </p> <p className="text-emerald-400"> {context.userData} </p>
     </>
     )
 }

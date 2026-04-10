@@ -49,7 +49,7 @@ export default function CognitoSignUpForm() {
     const onSubmitForm = async (data) => {
 
         try {
-            const {isSignUpComplete, userId, nextStep} = await signUp({
+            const {isSignUpComplete, nextStep} = await signUp({
                 username: data.email,
                 password: data.password
             })

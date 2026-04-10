@@ -2,6 +2,7 @@ import {z} from "zod"
 import { useForm } from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import { confirmSignUp } from 'aws-amplify/auth';
+import {useNavigate} from "react-router";
 
 export default function InputOtpForm( { email }) {
 
@@ -20,14 +21,19 @@ export default function InputOtpForm( { email }) {
         resolver: zodResolver(schema)
     });
 
+    const navigate = useNavigate()
+
     const onVerifyOTP = async (data) => {
          try {
-             const { isSignUpComplete, nextStep } = await confirmSignUp({
+             const {isSignUpComplete } = await confirmSignUp({
                  username: email,
                  confirmationCode: data.otp
              });
 
-             console.log(nextStep.signUpStep === "DONE")
+             if (isSignUpComplete) {
+                 navigate("/login", { replace: true})
+             }
+
 
          } catch (error) {
 
