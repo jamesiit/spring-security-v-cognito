@@ -10,7 +10,33 @@ export default function TestAuth() {
     const { isPending, error, data } = useQuery({
         queryKey: ['hi-endpoint'],
         queryFn: async () => {
-            console.log("Testing...")
+            // grab the session
+            const session = await fetchAuthSession()
+            const token = session.tokens?.accessToken?.toString()
+
+            // attach as a header
+            const headers = {
+                "Content-Type": "application/json"
+            }
+
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`
+            }
+
+            // fire it
+            const response = await fetch("http://localhost:8080/hi", {
+                method: "GET",
+                headers: headers
+            })
+
+            if (!response.ok) {
+                throw new Error(`Spring Boot rejected the request: ${response.status}`)
+            }
+
+            console.log(data)
+
+            return response.json()
+
         }
     })
 
