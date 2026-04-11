@@ -4,20 +4,25 @@ import {BrowserRouter, Routes, Route} from "react-router"
 import SignInForm from "./components/SignInForm.jsx";
 import TestAuth from "./components/TestAuth.jsx";
 import {UserProvider} from "./context/UserProvider.jsx";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+
+const queryClient = new QueryClient()
 
 function App() {
 
     return (
-        <UserProvider>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<CognitoSignUpForm/>}/>
-                    <Route path="/login" element={<SignInForm/>}/>
-                    <Route path="/hi" element={<TestAuth />}/>
-                    <Route path="*" element={<h1 className="text-white">This page was not found.</h1>}/>
-                </Routes>
-            </BrowserRouter>
-        </UserProvider>
+        <QueryClientProvider client={queryClient}>
+            <UserProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<CognitoSignUpForm/>}/>
+                        <Route path="/login" element={<SignInForm/>}/>
+                        <Route path="/hi" element={<TestAuth/>}/>
+                        <Route path="*" element={<h1 className="text-white">This page was not found.</h1>}/>
+                    </Routes>
+                </BrowserRouter>
+            </UserProvider>
+        </QueryClientProvider>
     )
 }
 

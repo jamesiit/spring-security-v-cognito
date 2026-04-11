@@ -1,10 +1,18 @@
 import {useContext} from "react";
 import {UserContext} from "../context/UserProvider.jsx";
 import {Navigate} from "react-router";
+import {useQuery} from "@tanstack/react-query";
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 export default function TestAuth() {
 
     const context = useContext(UserContext)
+    const { isPending, error, data } = useQuery({
+        queryKey: ['hi-endpoint'],
+        queryFn: async () => {
+            console.log("Testing...")
+        }
+    })
 
     if (context.isLoading) {
         return (
