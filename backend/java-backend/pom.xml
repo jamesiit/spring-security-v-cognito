@@ -82,12 +82,20 @@
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
-        <!-- Dependecy for Spring Mail
+        <!-- Dependency for Spring Mail
         Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
             <version>4.1.0-M3</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Dependency for asymmetric jwt cryptography which is the one Cognito uses!
+        Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-oauth2-resource-server -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+            <version>4.0.3</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
