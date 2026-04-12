@@ -55,8 +55,9 @@ export default function TestAuth() {
     return (
     <>
         <h1 className="text-white"> Spring Security vs Cognito? I thought Iran vs US these days! </h1>
+        <br />
         <p className="text-white"> You're authenticated as: </p> <p className="text-emerald-400"> {context.userData} </p>
-        {data && <p className="text-white"> And your message is: {data} </p>}
+        <p className="text-white"> And your AWS UUID is: </p> <p className="text-emerald-400"> {data} </p>
     </>
     )
 }
