@@ -33,9 +33,11 @@ export default function TestAuth() {
                 throw new Error(`Spring Boot rejected the request: ${response.status}`)
             }
 
-            console.log(data)
+            const extractedText = await response.text()
+            console.log("Response from Spring Boot: ", extractedText)
 
-            return response.json()
+            return extractedText
+
 
         }
     })
@@ -54,6 +56,7 @@ export default function TestAuth() {
     <>
         <h1 className="text-white"> Spring Security vs Cognito? I thought Iran vs US these days! </h1>
         <p className="text-white"> You're authenticated as: </p> <p className="text-emerald-400"> {context.userData} </p>
+        {data && <p className="text-white"> And your message is: {data} </p>}
     </>
     )
 }
